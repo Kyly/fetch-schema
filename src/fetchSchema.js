@@ -9,29 +9,35 @@ const logger = createLogger();
 const getSchemaFromResponse = ({data: {data: schema}}) => buildClientSchema(schema);
 const getErrorsFromResponse = ({data: { errors = [] }}) => errors;
 
-const createSpinner = () => ora({text: 'Loading schema...', color: 'blue'}).start();
+const createSpinner = (text) => ora({text, color: 'blue'}).start();
 
-const introspect = async (url, descriptions, config) => axios
+const introspect = async ({url, config = {}}, {descriptions = false} = {}) => axios
     .post(url, {query: getIntrospectionQuery({descriptions})}, config);
 
-const fetchIntrospectiveSchema = async (url, descriptions, config) => {
-    const spinner = createSpinner();
-    const introspectionResponse = await introspect(url, descriptions, config).catch(error => {
-        spinner.fail(error.message);
-        throw new Error(error.message);
-    });
+const fetchIntrospectiveSchema = async (requestConfig, queryOptions) => {
+    const introspectionResponse = await introspect(requestConfig, queryOptions);
 
     const errors = getErrorsFromResponse(introspectionResponse);
     if (errors.length !== 0) {
         const error = errors[0];
-        spinner.fail(error.message);
         throw new Error(error.message);
     }
 
-    spinner.succeed('Done!');
     return getSchemaFromResponse(introspectionResponse);
 };
 
+/**
+ * Fetches schema sdl from and endpoint using introspection.
+ * 
+ * @param {{url: string, config: object?}} requestConfig - url is the graphql endpoint you wish to use. Config is passed
+ * to the Axios client (AxiosRequestConfig).
+ * @param {{descriptions: boolean?}?} queryOptions - options used for generating query.
+ * @returns {Promise<string>}
+ */
+export const fetchSchemaSDL = async (requestConfig, queryOptions) => {
+    const schema = await fetchIntrospectiveSchema(requestConfig, queryOptions);
+    return printSchema(schema);
+};
 
 const fetchSchema = async (url, {user: username, password, fileName, descriptions}) => {
     const useBasicAuth = username !== undefined && password !== undefined;
@@ -43,16 +49,27 @@ const fetchSchema = async (url, {user: username, password, fileName, description
     ]);
 
     const config = useBasicAuth ? {auth: {username, password}} : {};
-    const schema = await fetchIntrospectiveSchema(url, descriptions, config);
 
-    const sdlString = printSchema(schema);
+    const spinner = createSpinner('Loading schema...');
+    const sdl = await fetchSchemaSDL({url, config}, {descriptions})
+        .catch(error => {
+            spinner.fail(error.message);
+            throw new Error(error.message);
+        });
+    spinner.succeed('Done fetching schema!');
+    
     if (fileName !== undefined) {
-        await fs.outputFile(fileName, sdlString);
-        logger.info(`Done writing schema to ${fileName}.`);
+        const spinner = createSpinner('Writing schema to file...');
+        await fs.outputFile(fileName, sdl).catch(error => {
+            spinner.fail(error.message);
+            throw new Error(error.message);
+        });
+        spinner.succeed(`Done writing schema to ${fileName}!`);
         return;
     }
 
-    console.log(sdlString);
+    console.log(sdl);
 };
+
 
 export default fetchSchema;

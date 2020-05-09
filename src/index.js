@@ -1,5 +1,5 @@
 import {program} from 'commander';
-import fetchSchema from './fetchSchema';
+import fetchSchemaAction, {fetchSchemaSDL} from './fetchSchema';
 
 program.exitOverride();
 
@@ -9,9 +9,9 @@ program
     .option('-p --password <password>', 'password used for basic auth')
     .option('-f --fileName <fileName>', 'file name for the generated schema definition')
     .option('-d --descriptions', 'flag to include descriptions in request')
-    .action(fetchSchema);
+    .action(fetchSchemaAction);
 
-const cli = async argv => {
+export const cli = async argv => {
     try {
         await program.parseAsync(argv);
     } catch (error) {
@@ -20,7 +20,4 @@ const cli = async argv => {
     }
 };
 
-export {
-    cli,
-    fetchSchema
-};
+export default fetchSchemaSDL;

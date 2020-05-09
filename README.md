@@ -22,12 +22,12 @@ to the console.
 This example uses the real [Snowtooth API](https://snowtooth.moonhighway.com/) for a fake ski resort.
 
 ```
-fetch-schema https://snowtooth.moonhighway.com/ -f countries.graphql
+fetch-schema https://snowtooth.moonhighway.com/ -f snowtooth.graphql -d
 
  GraphQL Endpoint: https://snowtooth.moonhighway.com/ 
 
-✔ Done!
-Done writing schema to snowtooth.graphql.
+✔ Done fetching schema!
+✔ Done writing schema to snowtooth.graphql!
 ```
 
 And the output file _snowtooth.graphql_ contains:
@@ -93,6 +93,23 @@ enum CacheControlScope {
 }
 
 scalar Upload
+```
+## API
+### fetchSchema ⇒ `Promise<string>`
+Fetches schema sdl from and endpoint using introspection.
+ 
+ | Param | Type | Description |
+ | --- | --- | --- |
+ | requestConfig | `{url: string, config: object?}` | url is the graphql endpoint you wish to use. Config is passed to the Axios client (AxiosRequestConfig). |
+ | queryOptions | `{descriptions: boolean?}?` | options used for generating query. |
+ 
+
+```javascript
+import fetchSchema from 'fetch-schema';
+
+fetchSchema({ url: 'https://snowtooth.moonhighway.com/' })
+    .then(sdl => console.log(sdl))
+    .catch(error => console.error(error));
 ```
 
 ## Enhancements
