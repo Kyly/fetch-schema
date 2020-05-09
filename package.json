@@ -1,0 +1,35 @@
+{
+  "name": "@kyly/fetch-schema",
+  "version": "1.0.0",
+  "description": "Converts a GraphQL introspection to schema definition language (SDL)",
+  "main": "src/index.js",
+  "author": "Kyly Vass",
+  "license": "MIT",
+  "bin": {
+    "@kyly/fetch-schema": "bin/fetch-schema",
+    "fetch-schema": "bin/fetch-schema"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "cli",
+    "gql",
+    "sdl",
+    "graphqql",
+    "fetch-schema"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "axios": "^0.19.2",
+    "chalk": "latest",
+    "commander": "^5.1.0",
+    "esm": "^3.2.25",
+    "fs-extra": "^9.0.0",
+    "graphql": "^15.0.0",
+    "ora": "^4.0.4"
+  }
+}
