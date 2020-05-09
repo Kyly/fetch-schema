@@ -4,6 +4,9 @@
   "description": "Converts a GraphQL introspection to schema definition language (SDL)",
   "main": "src/index.js",
   "author": "Kyly Vass",
+  "repository": {
+    "url": "git@github.com:Kyly/fetch-schema.git"
+  },
   "license": "MIT",
   "bin": {
     "@kyly/fetch-schema": "bin/fetch-schema",

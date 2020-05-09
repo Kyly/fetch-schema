@@ -1,15 +1,26 @@
 import {program} from 'commander';
-import fetchSdlAction from './fetchSdlAction';
+import fetchSchema from './fetchSchema';
+
+program.exitOverride();
 
 program
     .arguments('<url>')
-    .requiredOption('-u --user <userName>')
-    .requiredOption('-p --password <password>')
-    .option('-f --fileName <fileName>')
-    .action(fetchSdlAction);
+    .option('-u --user <userName>', 'user name used for basic auth')
+    .option('-p --password <password>', 'password used for basic auth')
+    .option('-f --fileName <fileName>', 'file name for the generated schema definition')
+    .option('-d --descriptions', 'flag to include descriptions in request')
+    .action(fetchSchema);
 
-const main = async argv => {
-    await program.parseAsync(argv);
+const cli = async argv => {
+    try {
+        await program.parseAsync(argv);
+    } catch (error) {
+        program.outputHelp();
+        process.exit(1);
+    }
 };
 
-export default main;
+export {
+    cli,
+    fetchSchema
+};
